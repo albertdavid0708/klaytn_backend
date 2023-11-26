@@ -1,0 +1,45 @@
+version: "3"
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      ENV_NAME: production
+    ports:
+      - "5005:5005"
+    volumes:
+      - logs:/home/node/app/logs
+
+  job_sync_blockchain:
+    container_name: job_sync_blockchain
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npx ts-node src/job/JobSyncBlockchain.ts
+    env_file:
+      - ".env"
+
+  job_sync_check_claim:
+    container_name: job_sync_blockchain
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npx ts-node src/job/JobSyncCheckClaim.ts
+    env_file:
+      - ".env"
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_SCHEMA}
+    ports:
+      - 3306:3306
+    volumes:
+      - db:/var/lib/mysql
