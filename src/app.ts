@@ -12,19 +12,7 @@ import { errorHandlerMiddleware } from "./middlewares/ErrorHandlerMiddlewares"; 
 import { UserRepo } from "./repositories/impl/UserRepo"; // Import a user repository implementation
 import { requestTimeMiddleware } from "./middlewares/RequestTimeMiddleware"; // Middleware for recording request time
 import morgan from "morgan";
-import { AuthService } from "./services/impl/AuthService";
-import { ExchangeService } from "./services/impl/ExchangeService";
-import { defaultRedisClient } from "./database/Redis";
-import {
-  PaymentService,
-  newPaymentService,
-} from "./services/impl/PaymentService";
-import { WalletTransactionRepo } from "./repositories/impl/WalletTransactionRepo";
-import { W2EPaymentGateway } from "./external_service/impl/W2EPaymentGateway";
-import { ContractRepo } from "./repositories/impl/ContractRepo";
-import { BlockchainRepo } from "./repositories/impl/BlockchainRepo";
-import { CurrencyRepo } from "./repositories/impl/CurrencyRepo";
-import { LogRepo } from "./repositories/impl/LogRepo";
+
 
 async function startWebServer(): Promise<void> {
   // Initialize MySQL data source
