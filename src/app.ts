@@ -12,7 +12,7 @@ import { errorHandlerMiddleware } from "./middlewares/ErrorHandlerMiddlewares"; 
 import { UserRepo } from "./repositories/impl/UserRepo"; // Import a user repository implementation
 import { requestTimeMiddleware } from "./middlewares/RequestTimeMiddleware"; // Middleware for recording request time
 import morgan from "morgan";
-
+import { RewardRouter } from "./routers/v1/RewardRouter";
 
 async function startWebServer(): Promise<void> {
   // Initialize MySQL data source
@@ -20,8 +20,10 @@ async function startWebServer(): Promise<void> {
   await dataSource.initialize();
   console.log("data Source is initialized successfully");
 
+  const rewardRouter = new RewardRouter();
+
   // Create user service and routers using the data source
-  const masterRouter: MasterRouter = new MasterRouter();
+  const masterRouter: MasterRouter = new MasterRouter(rewardRouter);
 
   // Express server application class
   class Server {

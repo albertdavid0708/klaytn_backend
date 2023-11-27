@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { IUserService } from "../../services/IUserService";
+import { calculateReward } from "../../job/JobSyncVaultFactory";
 
-export class UserRouter {
+export class RewardRouter {
   private readonly _router = Router();
 
-  constructor(private readonly userService: IUserService) {
+  constructor() {
     this._configure();
   }
 
@@ -14,25 +15,13 @@ export class UserRouter {
 
   private _configure() {
     this._router.get(
-      "/:id",
+      "/:address",
       async (req: Request, res: Response, next: NextFunction) => {
         try {
+          const address: string = req.params.address.toString();
           res
             .status(200)
-            .json(await this.userService.findOneById(parseInt(req.params.id)));
-        } catch (error) {
-          next(error);
-        }
-      }
-    );
-
-    this._router.post(
-      "",
-      async (req: Request, res: Response, next: NextFunction) => {
-        try {
-          res
-            .status(200)
-            .json(await this.userService.findOneById(parseInt(req.params.id)));
+            .json({ data: { reward: await calculateReward(address) } });
         } catch (error) {
           next(error);
         }

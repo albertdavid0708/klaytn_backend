@@ -27,6 +27,9 @@ const envVarsSchema = Joi.object()
     W2E_ENDPOINT: Joi.string(),
     W2E_ACCESS_KEY: Joi.string(),
     CHECKSUM_KEY: Joi.string(),
+
+    VAULT_FACTORY: Joi.string(),
+    VAULT_ADDRESS: Joi.string(),
   })
   .unknown();
 
@@ -62,4 +65,8 @@ export const env = {
     db: 0,
   },
   jwtSecret: envVars.JWT_SECRET || "",
+  address: {
+    vaultFactory: envVars.VAULT_FACTORY,
+    vaultAddress: envVars.VAULT_ADDRESS,
+  },
 };
