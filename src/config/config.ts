@@ -68,5 +68,6 @@ export const env = {
   address: {
     vaultFactory: envVars.VAULT_FACTORY,
     vaultAddress: envVars.VAULT_ADDRESS,
+    sepolia: "0x6291Cf69a372Fbb68a2dF0C619d1DE52F38bBa8f",
   },
 };
