@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { env } from "../config/config";
 import sepoliaABI from "../../assets/sepoliaABI.json";
 import Alphacado from "../../assets/Alphacado.json";
+import { baseJob } from "./JobBase";
 
 async function listenEventBridge(blockNumber: number): Promise<number> {
   console.log("currentblock", blockNumber);
@@ -65,14 +66,16 @@ async function listenEventBridge(blockNumber: number): Promise<number> {
 }
 async function JobBridge() {
   const INTERVAL = 5 * 1000;
-  let blockNumber = 0;
-  setInterval(async () => {
-    try {
+  let blockNumber = 4789648;
+  baseJob(
+    () => {
+      return false;
+    },
+    async () => {
       blockNumber = await listenEventBridge(blockNumber);
-    } catch (error) {
-      console.error(error);
-    }
-  }, INTERVAL);
+    },
+    INTERVAL
+  );
 }
 
 JobBridge().then();
