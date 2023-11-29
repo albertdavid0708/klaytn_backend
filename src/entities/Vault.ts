@@ -1,74 +1,75 @@
 import { COIN_TYPE_ARG_REGEX } from "@mysten/sui.js";
 import "reflect-metadata";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-
+import { Entity, PrimaryGeneratedColumn, Column, Index } from "typeorm";
 @Entity("vault")
 export class Vault {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
+  @Index({ unique: true })
   address: string;
 
-  @Column()
+  @Column({ nullable: true })
   BASIS_POINTS: string;
 
-  @Column()
+  @Column({ nullable: true })
   MAX_DEPOSIT_FEE: string;
 
-  @Column()
+  @Column({ nullable: true })
   PRECISION_FACTOR: string;
-  @Column()
+
+  @Column({ nullable: true })
   VAULT_FACTORY: string;
 
-  @Column()
+  @Column({ nullable: true })
   accTokenPerShare: string;
 
-  @Column()
+  @Column({ nullable: true })
   bonusEndBlock: string;
 
-  @Column()
+  @Column({ nullable: true })
   depositFee: string;
 
-  @Column()
+  @Column({ nullable: true })
   feeToAddress: string;
 
-  @Column()
+  @Column({ nullable: true })
   hasUserLimit: string;
 
-  @Column()
+  @Column({ nullable: true })
   isInitialized: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastRewardBlock: string;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   owner: string;
 
-  @Column()
+  @Column({ nullable: true })
   pendingOwner: string;
 
-  @Column()
+  @Column({ nullable: true })
   pendingReward: string;
 
-  @Column()
+  @Column({ nullable: true })
   poolLimitPerUser: string;
 
-  @Column()
+  @Column({ nullable: true })
   rewardPerBlock: string;
 
-  @Column()
+  @Column({ nullable: true })
   rewardToken: string;
 
-  @Column()
+  @Column({ nullable: true })
   stakedToken: string;
 
-  @Column()
+  @Column({ nullable: true })
   startBlock: string;
 
-  @Column()
+  @Column({ nullable: true })
   userInfo: string;
 }

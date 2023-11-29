@@ -3,6 +3,7 @@ import { env } from "../config/config";
 import sepoliaABI from "../../assets/sepoliaABI.json";
 import Alphacado from "../../assets/Alphacado.json";
 import { baseJob } from "./JobBase";
+import { providerKlaytn } from "./provider";
 
 async function listenEventBridge(blockNumber: number): Promise<number> {
   console.log("currentblock", blockNumber);
@@ -11,10 +12,6 @@ async function listenEventBridge(blockNumber: number): Promise<number> {
     { name: "ETH", chainId: 11155111 }
   );
 
-  const providerKlaytn = new ethers.providers.JsonRpcBatchProvider(
-    "https://rpc.ankr.com/klaytn_testnet",
-    { name: "KLAY", chainId: 1001 }
-  );
   const wallet = new ethers.Wallet(env.privateKey, providerKlaytn);
 
   const contract = new ethers.Contract(

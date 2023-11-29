@@ -17,6 +17,6 @@ export class MasterRouter {
    * Connect routes to their matching routers.
    */
   private _configure() {
-    this._router.use("/reward", this.rewardRouter.router);
+    this._router.use("", this.rewardRouter.router);
   }
 }
