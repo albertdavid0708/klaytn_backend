@@ -3,7 +3,8 @@ import { env } from "../config/config";
 import sepoliaABI from "../../assets/sepoliaABI.json";
 import Alphacado from "../../assets/Alphacado.json";
 
-async function listenEventBridge() {
+async function listenEventBridge(blockNumber: number): Promise<number> {
+  console.log("currentblock", blockNumber);
   const provider = new ethers.providers.JsonRpcProvider(
     "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
     { name: "ETH", chainId: 11155111 }
@@ -35,24 +36,43 @@ async function listenEventBridge() {
 
   const fromBlock = currentBlockNumber - 1024;
 
-  const logs = await contract.queryFilter(
-    filter,
-    fromBlock,
-    currentBlockNumber
-  );
-  const args: any = logs[0].args;
-  console.log(args.payload, args.USDCAmount);
-
-  const tx = await contractKlaytn.receivePayloadAndTokens(
-    args.payload,
-    args.USDCAmount.toString(),
-    {
-      gasLimit: 500000,
+  const logs = (
+    await contract.queryFilter(filter, fromBlock, currentBlockNumber)
+  ).reverse();
+  if (logs.length === 0) {
+    return blockNumber;
+  }
+  for (const l of logs) {
+    if (l.blockNumber === blockNumber) {
+      return logs[0].blockNumber;
     }
-  );
-  const receipt_2 = await tx.wait();
+    const args: any = l.args;
+    console.log(l.blockNumber);
+    try {
+      const tx = await contractKlaytn.receivePayloadAndTokens(
+        args.payload,
+        args.USDCAmount.toString(),
+        {
+          gasLimit: 500000,
+        }
+      );
+      const receipt_2 = await tx.wait();
+      console.log("Transaction mined:", receipt_2.transactionHash);
+    } catch (error) {}
+  }
 
-  console.log("Transaction mined:", receipt_2.transactionHash);
+  return logs[0].blockNumber;
+}
+async function JobBridge() {
+  const INTERVAL = 5 * 1000;
+  let blockNumber = 0;
+  setInterval(async () => {
+    try {
+      blockNumber = await listenEventBridge(blockNumber);
+    } catch (error) {
+      console.error(error);
+    }
+  }, INTERVAL);
 }
 
-listenEventBridge();
+JobBridge().then();

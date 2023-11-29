@@ -13,23 +13,13 @@ services:
     volumes:
       - logs:/home/node/app/logs
 
-  job_sync_blockchain:
-    container_name: job_sync_blockchain
+  listen_event:
+    container_name: listen_event
     restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
-    command: npx ts-node src/job/JobSyncBlockchain.ts
-    env_file:
-      - ".env"
-
-  job_sync_check_claim:
-    container_name: job_sync_blockchain
-    restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: npx ts-node src/job/JobSyncCheckClaim.ts
+    command: npx ts-node src/job/ListenEvent.ts
     env_file:
       - ".env"
 
