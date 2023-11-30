@@ -10,8 +10,7 @@ import { DataSource } from "typeorm";
 import { Vault } from "../entities/Vault";
 import { BlockNumber } from "../entities/BlockNumber";
 
-async function getVaultEvent(blockNumber: number, mysqlDataSource: DataSource) {
-  console.log("currentblock", blockNumber);
+async function getVaultEvent(mysqlDataSource: DataSource) {
   const vaultRepository = mysqlDataSource.getRepository(Vault);
   const blockNumberRepository = mysqlDataSource.getRepository(BlockNumber);
 
@@ -35,14 +34,11 @@ async function getVaultEvent(blockNumber: number, mysqlDataSource: DataSource) {
   const filter = contractKlaytn.filters[eventName]();
   const currentBlockNumber = await providerKlaytn.getBlockNumber();
   let fromBlock: number;
-  if (blockNumberDatabase.blockNumber === 0) {
-    fromBlock = currentBlockNumber - 2048;
-  } else {
-    fromBlock = blockNumberDatabase.blockNumber;
-  }
+  fromBlock = currentBlockNumber - 1024;
   const logs = (
     await contractKlaytn.queryFilter(filter, fromBlock, currentBlockNumber)
   ).reverse();
+
   for (const l of logs) {
     const args: any = l.args;
     const vaultAddress = args.vault;
@@ -57,7 +53,7 @@ async function getVaultEvent(blockNumber: number, mysqlDataSource: DataSource) {
     newVault.address = vaultAddress;
     newVault.name = name;
     try {
-      vaultRepository.save(newVault);
+      await vaultRepository.save(newVault);
     } catch (e) {
       console.log(e);
     }
@@ -79,7 +75,7 @@ async function JobGetVault() {
       return false;
     },
     async () => {
-      blockNumber = await getVaultEvent(blockNumber, mysqlDataSource);
+      blockNumber = await getVaultEvent(mysqlDataSource);
     },
     INTERVAL
   );
