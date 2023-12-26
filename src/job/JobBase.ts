@@ -18,8 +18,6 @@ export async function baseJob(
     } catch (e) {
       console.error(e);
     }
-    await console.log("Start", new Date().getTime());
     await delay(duration);
-    await console.log("end", new Date().getTime());
   }
 }

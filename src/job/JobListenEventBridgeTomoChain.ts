@@ -73,6 +73,8 @@ async function JobBridge() {
   const INTERVAL = 1 * 1000;
   let blockNumber = 4789648;
 
+  const test = await redis.get(env.address.alphacadoAddress)
+  console.log(test)
   baseJob(
     () => {
       return false;
