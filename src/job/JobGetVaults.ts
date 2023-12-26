@@ -3,21 +3,24 @@ import { env } from "../config/config";
 import VaultFactoryABI from "../../assets/VaultFactoryABI.json";
 import VaultABI from "../../assets/VaultABI.json";
 import { baseJob } from "./JobBase";
-import { providerKlaytn } from "./provider";
+import { providerKlaytn, providerTomoChain } from "./provider";
 import { log } from "console";
 import { mysqlDataSource } from "../database/MyDataSource";
 import { DataSource } from "typeorm";
 import { Vault } from "../entities/Vault";
 import { BlockNumber } from "../entities/BlockNumber";
 
-async function getVaultEvent(mysqlDataSource: DataSource) {
+async function getVaultEvent(
+  mysqlDataSource: DataSource,
+  provider: ethers.providers.JsonRpcProvider
+) {
   const vaultRepository = mysqlDataSource.getRepository(Vault);
   const blockNumberRepository = mysqlDataSource.getRepository(BlockNumber);
 
   const contractKlaytn = new ethers.Contract(
     env.address.vaultFactory,
     VaultFactoryABI,
-    providerKlaytn
+    provider
   );
 
   let blockNumberDatabase = await blockNumberRepository.findOne({
@@ -32,7 +35,7 @@ async function getVaultEvent(mysqlDataSource: DataSource) {
   }
   const eventName = "NewVault";
   const filter = contractKlaytn.filters[eventName]();
-  const currentBlockNumber = await providerKlaytn.getBlockNumber();
+  const currentBlockNumber = await provider.getBlockNumber();
   let fromBlock: number;
   fromBlock = currentBlockNumber - 1024;
   const logs = (
@@ -43,11 +46,7 @@ async function getVaultEvent(mysqlDataSource: DataSource) {
     const args: any = l.args;
     const vaultAddress = args.vault;
 
-    const contractVault = new ethers.Contract(
-      vaultAddress,
-      VaultABI,
-      providerKlaytn
-    );
+    const contractVault = new ethers.Contract(vaultAddress, VaultABI, provider);
     const name = await contractVault.name();
     const newVault = new Vault();
     newVault.address = vaultAddress;
@@ -75,7 +74,7 @@ async function JobGetVault() {
       return false;
     },
     async () => {
-      blockNumber = await getVaultEvent(mysqlDataSource);
+      blockNumber = await getVaultEvent(mysqlDataSource, providerTomoChain);
     },
     INTERVAL
   );
