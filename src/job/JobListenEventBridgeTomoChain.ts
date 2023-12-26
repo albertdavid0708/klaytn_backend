@@ -19,7 +19,6 @@ async function listenEventBridge(
   providerBridgeChain: ethers.providers.JsonRpcProvider,
   alphacadoAddress: string
 ): Promise<number> {
-  console.log("currentblock", blockNumber);
   const provider = new ethers.providers.JsonRpcProvider(connectionUrl, network);
 
   const wallet = new ethers.Wallet(env.privateKey, providerBridgeChain);
@@ -73,8 +72,8 @@ async function JobBridge() {
   const INTERVAL = 1 * 1000;
   let blockNumber = 4789648;
 
-  const test = await redis.get(env.address.alphacadoAddress)
-  console.log(test)
+  const test = await redis.get(env.address.alphacadoAddress);
+  console.log(test);
   baseJob(
     () => {
       return false;
