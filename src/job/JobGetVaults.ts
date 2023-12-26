@@ -67,7 +67,7 @@ async function getVaultEvent(
 async function JobGetVault() {
   const dataSource = mysqlDataSource;
   await dataSource.initialize();
-  const INTERVAL = 5 * 1000;
+  const INTERVAL = 1 * 1000;
   let blockNumber = 4789648;
   baseJob(
     () => {
