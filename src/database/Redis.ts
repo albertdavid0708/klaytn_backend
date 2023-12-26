@@ -60,5 +60,5 @@ class RedisCache implements ICache {
 const defaultRedisClient = new RedisCache(createRedisClient())
 export  {
   RedisCache,
-  defaultRedisClient
+  defaultRedisClient,
 }

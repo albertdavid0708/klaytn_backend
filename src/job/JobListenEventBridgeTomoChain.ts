@@ -3,19 +3,26 @@ import { env } from "../config/config";
 import sepoliaABI from "../../assets/sepoliaABI.json";
 import Alphacado from "../../assets/Alphacado.json";
 import { baseJob } from "./JobBase";
-import { providerKlaytn } from "./provider";
+import { providerKlaytn, providerTomoChain } from "./provider";
+import { createRedisClient } from "../database/Redis";
 
 const connectionUrl = "https://ethereum-sepolia.blockpi.network/v1/rpc/public";
 const network = {
   name: "ETH",
   chainId: 11155111,
 };
+const redis = createRedisClient();
 
-async function listenEventBridge(blockNumber: number): Promise<number> {
+const eventName = "CrossChainRequest";
+async function listenEventBridge(
+  blockNumber: number,
+  providerBridgeChain: ethers.providers.JsonRpcProvider,
+  alphacadoAddress: string
+): Promise<number> {
   console.log("currentblock", blockNumber);
   const provider = new ethers.providers.JsonRpcProvider(connectionUrl, network);
 
-  const wallet = new ethers.Wallet(env.privateKey, providerKlaytn);
+  const wallet = new ethers.Wallet(env.privateKey, providerBridgeChain);
 
   const contract = new ethers.Contract(
     env.address.sepolia,
@@ -23,12 +30,13 @@ async function listenEventBridge(blockNumber: number): Promise<number> {
     provider
   );
   const contractKlaytn = new ethers.Contract(
-    "0xf30D771D5D1940C3Bbc44d200E87fcce29318CaC",
+    alphacadoAddress,
     Alphacado,
     wallet
   );
 
-  const eventName = "CrossChainRequest";
+  const keyRedis = alphacadoAddress;
+
   const filter = contract.filters[eventName]();
   const currentBlockNumber = await provider.getBlockNumber();
 
@@ -42,6 +50,7 @@ async function listenEventBridge(blockNumber: number): Promise<number> {
   }
   for (const l of logs) {
     if (l.blockNumber === blockNumber) {
+      await redis.set(keyRedis, blockNumber);
       return logs[0].blockNumber;
     }
     const args: any = l.args;
@@ -61,14 +70,19 @@ async function listenEventBridge(blockNumber: number): Promise<number> {
   return logs[0].blockNumber;
 }
 async function JobBridge() {
-  const INTERVAL = 5 * 1000;
+  const INTERVAL = 1 * 1000;
   let blockNumber = 4789648;
+
   baseJob(
     () => {
       return false;
     },
     async () => {
-      blockNumber = await listenEventBridge(blockNumber);
+      blockNumber = await listenEventBridge(
+        blockNumber,
+        providerTomoChain,
+        env.address.alphacadoAddress
+      );
     },
     INTERVAL
   );
